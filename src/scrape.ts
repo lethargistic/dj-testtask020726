@@ -50,9 +50,14 @@ const extractItemId = (url: string, breadcrumbActiveText: Nullable<string>): Nul
     return segments.at(-1) ?? breadcrumbActiveText ?? null;
 };
 
-const extractBrand = async (page: Page): Promise<Nullable<string>> => {
+const extractBrand = async (page: Page, productTitle: Nullable<string>): Promise<Nullable<string>> => {
+    if (!productTitle) return null;
     const pageTitle = await safe(() => page.title(), '');
-    return pageTitle.split(' ')[0] || null;
+
+    const idx = pageTitle.toLowerCase().indexOf(productTitle.toLowerCase());
+    if (idx <= 0) return null;
+
+    return pageTitle.slice(0, idx).trim() || null;
 };
 
 // dropping home and current product as neither are really a category
@@ -195,7 +200,7 @@ const main = async () => {
     const breadcrumbActiveText = await extractBreadcrumbActiveText(page);
     const itemId = extractItemId(page.url(), breadcrumbActiveText?.trim() ?? null);
     const title = await extractTitle(page);
-    const brand = await extractBrand(page);
+    const brand = await extractBrand(page, title);
     const categoryTree = await extractCategoryTree(page);
     const priceRaw = await extractPriceRaw(page);
     const description = await extractDescription(page);
@@ -209,8 +214,8 @@ const main = async () => {
         url: page.url(),
         item_id: itemId,
         title: title?.trim() ?? null,
-        // not entirely sure how reliable getting the brand from the title is,
-        // would require looking a lot at some other pages so not setting as null, more of a to-do
+        // not entirely sure how reliable getting the brand from the page title is,
+        // would require looking at the consistency in some other pages, but if not, it's just null
         brand: brand ?? null,
         product_category: categoryTree.length ? categoryTree.map((c) => c.name).join(' > ') : null,
         category_tree: categoryTree,
@@ -224,7 +229,7 @@ const main = async () => {
         star_rating: starRating,
         review_count: reviewCount,
         gtin: null, // it's not found on the page or the data
-        mpn: null, // also can't find it
+        mpn: null, // there is a manufacture number in the specs, but I googled what an MPN is and it doesn't look like one
         scraped_at: Temporal.Now.instant().toString(),
     };
 
