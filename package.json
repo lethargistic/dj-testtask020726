@@ -1,0 +1,19 @@
+{
+  "name": "msi-product-scraper",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "scrape": "tsx src/scrape.ts"
+  },
+  "dependencies": {
+    "playwright": "^1.61.1",
+    "tsx": "^4.22.4"
+  },
+  "devDependencies": {
+    "typescript": "~6.0.3"
+  },
+  "private": true
+}
