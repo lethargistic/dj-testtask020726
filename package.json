@@ -9,10 +9,12 @@
     "scrape": "tsx src/scrape.ts"
   },
   "dependencies": {
+    "@js-temporal/polyfill": "^0.5.1",
     "playwright": "^1.61.1",
     "tsx": "^4.22.4"
   },
   "devDependencies": {
+    "@types/node": "^26.1.0",
     "typescript": "~6.0.3"
   },
   "private": true
